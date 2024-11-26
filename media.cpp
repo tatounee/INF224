@@ -10,28 +10,9 @@ Media::Media(std::string name, std::string pathname)
     this->pathname = pathname;
 }
 
-std::string Media::getName() const
+void Media::display(std::ostream &sout) const
 {
-    return this->name;
-}
-
-std::string Media::getPathname() const
-{
-    return this->pathname;
-}
-
-void Media::setName(std::string name)
-{
-    this->name = name;
-}
-
-void Media::setPathname(std::string pathname)
-{
-    this->pathname = pathname;
-}
-
-void Media::display(std::ostream & sout) const {
     sout << "[Media]" << std::endl
-        << "\tname: \"" << this->name << "\"\n"
-        << "\tpathname: \"" << this->pathname << "\"\n";
+         << "\tname: \"" << this->name << "\"\n"
+         << "\tpathname: \"" << this->pathname << "\"\n";
 }

@@ -16,16 +16,17 @@ private:
 public:
     /// @brief Constructeur par défaut.
     Video() {};
+    
     /// @brief Constructeur avec paramètres.
     /// @param name Le nom de la vidéo.
     /// @param pathname Le chemin du fichier associé.
     /// @param duration La durée de la vidéo.
-    Video(std::string name, std::string pathname, uint32_t duration) : Media(name, pathname)
-    {
-        this->duration = duration;
-    };
+    Video(std::string name,
+          std::string pathname,
+          uint32_t duration) : Media(name, pathname),
+                               duration{duration} {};
 
-    uint32_t getDuration() { return this->duration; };
+    uint32_t getDuration() const { return this->duration; };
     void setDuration(uint32_t duration) { this->duration = duration; };
 
     /// @brief Affiche les informations de la vidéo.

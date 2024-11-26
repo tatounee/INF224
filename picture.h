@@ -17,16 +17,18 @@ private:
 public:
     /// @brief Constructeur par défaut.
     Picture() {};
+
     /// @brief Constructeur avec paramètres.
     /// @param name Le nom de l'image.
     /// @param pathname Le chemin du fichier associé.
     /// @param width La largeur de l'image.
     /// @param height La hauteur de l'image.
-    Picture(std::string name, std::string pathname, uint32_t width, uint32_t height) : Media(name, pathname)
-    {
-        this->width = width;
-        this->height = height;
-    };
+    Picture(
+        std::string name,
+        std::string pathname,
+        uint32_t width, uint32_t height) : Media(name, pathname),
+                                           width{width},
+                                           height{height} {};
 
     uint32_t getWidth() { return this->width; };
     uint32_t getHeight() { return this->height; };
@@ -46,7 +48,8 @@ public:
     }
 
     /// @brief Affiche l'image avec `imagej`.
-    void play() const override {
+    void play() const override
+    {
         std::string cmd = std::string("imagej ");
         cmd += this->getPathname();
         cmd += " &";

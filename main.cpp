@@ -1,27 +1,28 @@
 
-#include "media.h"
-#include "picture.h"
-#include "video.h"
+#include <iostream>
+
+#include "movie.h"
 
 int main()
 {
-    Picture *pic = new Picture(
-        std::string("Imagination"),
-        std::string("/home/tatoune/Pictures/imagination.jpg"),
-        1920,
-        1080);
+    uint32_t chapters[] = {0, 10, 17, 23};
 
-    Video *vid = new Video(
+    Movie *mov = new Movie(
         std::string("TMS"),
         std::string("/home/tatoune/Videos/Screencasts/tsm.mp4"),
-        35);
+        35,
+        chapters,
+        4);
 
-    Media *medias[] = {
-        pic,
-        vid};
+    mov->display(std::cout);
 
-    for (size_t i = 0; i < 2; i++)
-        medias[i]->play();
+    uint32_t *newChapters = new uint32_t[2]{42, 666};
+
+    mov->setChapters(newChapters, 2);
+    mov->display(std::cout);
+
+    delete[] newChapters;
+    mov->display(std::cout);
 
     return 0;
 }
