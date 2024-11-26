@@ -38,7 +38,7 @@ public:
     }
 
     /// @brief Joue la vidéo avec `mpv`.
-    void play()
+    void play() const override
     {
         std::string cmd = std::string("mpv ");
         cmd += this->getPathname();

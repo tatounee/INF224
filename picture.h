@@ -46,8 +46,7 @@ public:
     }
 
     /// @brief Affiche l'image avec `imagej`.
-    void play()
-    {
+    void play() const override {
         std::string cmd = std::string("imagej ");
         cmd += this->getPathname();
         cmd += " &";
