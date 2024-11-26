@@ -30,6 +30,8 @@ public:
     /// @brief Affiche les informations du média.
     /// @param sout Le flux de sortie.
     void display(std::ostream &sout) const;
+
+    virtual void play() const {};
 };
 
 #endif

@@ -1,13 +1,24 @@
 
-#include "media.h"
+#include "picture.h"
+#include "video.h"
 
 int main()
 {
-    Media *m1 = new Media();
-    Media *m2 = new Media(std::string("Harry Potter"), std::string("/media/harry_potter.mp4"));
-    
-    m1->display(std::cout);
-    m2->display(std::cout);
-    
+    Picture *pic = new Picture(
+        std::string("Imagination"),
+        std::string("/home/tatoune/Pictures/imagination.jpg"),
+        1920,
+        1080
+    );
+
+    Video *vid = new Video(
+        std::string("TMS"),
+        std::string("/home/tatoune/Videos/Screencasts/tsm.mp4"),
+        35
+    );
+
+    pic->play();
+    vid->play();
+
     return 0;
 }
