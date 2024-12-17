@@ -55,7 +55,8 @@ LDLIBS =
 all: ${PROG}
 
 run: ${PROG}
-	./${PROG}
+	@clear
+	@./${PROG}
 
 ${PROG}: depend-${PROG} ${OBJETS}
 	${CXX} -o $@ ${CXXFLAGS} ${LDFLAGS} ${OBJETS} ${LDLIBS}
