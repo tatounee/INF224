@@ -24,7 +24,7 @@ void Movie::display(std::ostream &sout) const
          << "\tname: \"" << this->getName() << "\"\n"
          << "\tpathname: \"" << this->getPathname() << "\"\n"
          << "\tduration: " << this->getDuration() << std::endl
-         << "\tchapters: ";
+         << "\tchapters: [";
 
     for (size_t i = 0; i < this->chaptersLength; i++)
     {
@@ -32,5 +32,5 @@ void Movie::display(std::ostream &sout) const
             sout << ", ";
         sout << this->chapters[i];
     }
-    sout << std::endl;
+    sout << "]" << std::endl;
 };
