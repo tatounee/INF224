@@ -3,11 +3,11 @@
 #define INT224_GROUP_H
 
 #include <list>
-
+#include <memory>
 #include "media.h"
 
 /// @brief Représente un groupe de médias.
-class Group : public std::list<Media *>
+class Group : public std::list<std::shared_ptr<Media>>
 {
 private:
     std::string name{};

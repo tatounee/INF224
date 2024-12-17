@@ -21,6 +21,10 @@ public:
     /// @param pathname Le chemin du fichier associé.
     Media(std::string name, std::string pathname) : name{name}, pathname{pathname} {};
 
+    ~Media() {
+        std::cout << "Media " << this->name << " deleted" << std::endl;
+    };
+
     std::string getName() const { return this->name; };
     std::string getPathname() const { return this->pathname; };
 
