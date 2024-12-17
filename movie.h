@@ -8,14 +8,18 @@
 
 #include "video.h"
 
+class Manager;
+
 /// @brief Représente un film, avec un nom, un fichier associé, une durée et des chapitres.
 class Movie : public Video
 {
+    friend class Manager;
+
 public:
     uint32_t *chapters{};
     size_t chaptersLength{};
 
-public:
+protected:
     /// @brief Constructeur par défaut.
     Movie() {};
 
@@ -33,6 +37,8 @@ public:
     {
         this->setChapters(chapters, chaptersLength);
     };
+
+public:
 
     Movie(const Movie& from);
     Movie &operator=(const Movie &from);

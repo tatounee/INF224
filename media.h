@@ -12,7 +12,7 @@ private:
     std::string name{};
     std::string pathname{};
 
-public:
+protected:
     /// @brief Constructeur par défaut.
     Media() : name(std::string()), pathname(std::string()) {};
 
@@ -21,6 +21,7 @@ public:
     /// @param pathname Le chemin du fichier associé.
     Media(std::string name, std::string pathname) : name{name}, pathname{pathname} {};
 
+public:
     std::string getName() const { return this->name; };
     std::string getPathname() const { return this->pathname; };
 

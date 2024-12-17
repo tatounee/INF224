@@ -7,14 +7,18 @@
 
 #include "media.h"
 
+class Manager;
+
 /// @brief Représente une image, avec un nom, un fichier associé, une largeur et une hauteur.
 class Picture : public Media
 {
+    friend class Manager;
+
 private:
     uint32_t width{};
     uint32_t height{};
 
-public:
+protected:
     /// @brief Constructeur par défaut.
     Picture() {};
 
@@ -29,6 +33,7 @@ public:
         uint32_t width, uint32_t height) : Media(name, pathname),
                                            width{width},
                                            height{height} {};
+public:
 
     uint32_t getWidth() { return this->width; };
     uint32_t getHeight() { return this->height; };

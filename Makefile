@@ -14,7 +14,7 @@ PROG = main
 #
 # Fichiers sources (NE PAS METTRE les .h ni les .o seulement les .cpp)
 #
-SOURCES = main.cpp movie.cpp
+SOURCES = main.cpp movie.cpp manager.cpp
 
 #
 # Fichiers objets (ne pas modifier sauf si l'extension n'est pas .cpp)

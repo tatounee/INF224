@@ -6,19 +6,25 @@
 #include <memory>
 #include "media.h"
 
+class Manager;
+
 /// @brief Représente un groupe de médias.
 class Group : public std::list<std::shared_ptr<Media>>
 {
+    friend class Manager;
+
 private:
     std::string name{};
 
-public:
+protected:
     /// @brief Constructeur par défaut.
     Group() : name(std::string()) {};
 
     /// @brief Constructeur avec paramètres.
     /// @param name Le nom du groupe.
     Group(std::string name) : name{name} {};
+
+public:
 
     std::string getName() const { return this->name; };
     void setName(std::string name) { this->name = name; };

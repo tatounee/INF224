@@ -7,13 +7,17 @@
 
 #include "media.h"
 
+class Manager;
+
 /// @brief Représente une vidéo, avec un nom, un fichier associé et une durée.
 class Video : public Media
 {
+    friend class Manager;
+
 private:
     uint32_t duration{};
 
-public:
+protected:
     /// @brief Constructeur par défaut.
     Video() {};
     
@@ -25,6 +29,7 @@ public:
           std::string pathname,
           uint32_t duration) : Media(name, pathname),
                                duration{duration} {};
+public:
 
     uint32_t getDuration() const { return this->duration; };
     void setDuration(uint32_t duration) { this->duration = duration; };
