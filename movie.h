@@ -34,12 +34,14 @@ public:
         this->setChapters(chapters, chaptersLength);
     };
 
+    Movie(const Movie& from);
+    Movie &operator=(const Movie &from);
+
     ~Movie()
     {
         if (this->chapters)
             delete[] this->chapters;
     }
-
 
     const uint32_t *getChapters() const { return this->chapters; };
     uint32_t getChaptersLength() const { return this->chaptersLength; };
