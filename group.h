@@ -24,6 +24,17 @@ protected:
     /// @param name Le nom du groupe.
     Group(std::string name) : name{name} {};
 
+    static std::shared_ptr<Group> new_shared(std::string name)
+    {
+        struct NonProtectedGroup : public Group
+        {
+        public:
+            NonProtectedGroup(std::string name) : Group(name) {}
+        };
+
+        return std::static_pointer_cast<Group>(std::make_shared<NonProtectedGroup>(name));
+    }
+
 public:
 
     std::string getName() const { return this->name; };
