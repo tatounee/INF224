@@ -1,6 +1,12 @@
 #include <list>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 #include "manager.h"
+#include "serde.h"
+
+#define TMP_KEY std::string("tmp-195a12a9-a5ab-40c1-a382-332102174f91")
 
 picture_ptr Manager::create_picture(std::string name, std::string pathname, uint32_t width, uint32_t height)
 {
@@ -111,4 +117,149 @@ void Manager::play_media(std::string name) const
     }
 
     media->second->play();
+}
+
+std::string Manager::serialize(symboles_list &symboles) const
+{
+    if (symboles.end() != std::find(symboles.begin(), symboles.end(), MANAGER_SYMB))
+        return std::string();
+    symboles.push_back(MANAGER_SYMB);
+
+    std::stringstream ss;
+    std::stringstream group_media_ss;
+
+    ss << ":" << MANAGER_SYMB << std::endl;
+    ss << "-Manager" << std::endl;
+    ss << "-";
+
+    int i = 0;
+    for (auto &group : this->groups)
+    {
+        if (i++ > 0)
+            ss << ",";
+        ss << group.second->getSymbole();
+
+        group_media_ss << group.second->serialize(symboles);
+    }
+
+    ss << std::endl;
+    ss << "-";
+
+    i = 0;
+    for (auto &media : this->medias)
+    {
+        if (i++ > 0)
+            ss << ",";
+        ss << media.second->getSymbole();
+
+        group_media_ss << media.second->serialize(symboles);
+    }
+
+    ss << std::endl;
+
+    ss << group_media_ss.str();
+
+    return ss.str();
+}
+
+void Manager::save(std::string filename) const
+{
+    std::ofstream file(filename);
+
+    if (!file.is_open())
+    {
+        std::cerr << "Could not open file \"" << filename << "\"." << std::endl;
+        return;
+    }
+
+    symboles_list symboles;
+    file << this->serialize(symboles);
+
+    file.close();
+}
+
+void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
+{
+    auto it = data.begin();
+    std::string group_list = *it++;
+    std::string media_list = *it++;
+
+    std::string name;
+
+    std::stringstream media_ss(media_list);
+    std::getline(media_ss, name, ',');
+    while (name != "")
+    {
+        serde_data_t symbole_data = symboles[name];
+
+        if (symbole_data.initialized_ptr != nullptr)
+        {
+            std::shared_ptr<Media> *media = (std::shared_ptr<Media> *)symbole_data.initialized_ptr;
+            this->medias[name] = *media;
+        }
+        else
+        {
+            media_ptr media;
+
+            if (symbole_data.class_name == "Picture")
+                media = this->create_picture(TMP_KEY, {}, {}, {});
+            else if (symbole_data.class_name == "Video")
+                media = this->create_video(TMP_KEY, {}, {});
+            else if (symbole_data.class_name == "Movie")
+                media = this->create_movie(TMP_KEY, {}, {}, {}, {});
+
+            (*media).deserialize(symbole_data.data, symboles);
+            this->medias.erase(TMP_KEY);
+            this->medias[media->getName()] = media;
+
+            // symboles[name].initialized_ptr = (void *)&media;
+            symbole_data.initialized_ptr = (void*)(&this->medias[media->getName()]);
+            symboles[name] = symbole_data;
+        }
+
+        name.clear();
+        std::getline(media_ss, name, ',');
+    }
+
+    std::stringstream groups_ss(group_list);
+    std::getline(groups_ss, name, ',');
+    while (name != "")
+    {
+        serde_data_t symbole_data = symboles[name];
+
+        if (symbole_data.initialized_ptr != nullptr)
+        {
+            std::shared_ptr<Group> *group = (std::shared_ptr<Group> *)symbole_data.initialized_ptr;
+            this->groups[name] = *group;
+        }
+        else
+        {
+            group_ptr group = this->create_group(name);
+            (*group).deserialize(symbole_data.data, symboles);
+            this->groups.erase(name);
+            this->groups[group->getName()] = group;
+
+            symbole_data.initialized_ptr = (void *)&group;
+        }
+
+        name.clear();
+        std::getline(groups_ss, name, ',');
+    }
+}
+
+void Manager::load(const std::string filename)
+{
+    std::ifstream file = std::ifstream(filename);
+
+    if (!file.is_open())
+    {
+        std::cerr << "Could not open file \"" << filename << "\"." << std::endl;
+        return;
+    }
+
+    symbole_map symboles = parse_symboles(file);
+    // print_symboles_map(symboles);
+    this->deserialize(symboles[MANAGER_SYMB].data, symboles);
+
+    file.close();
 }

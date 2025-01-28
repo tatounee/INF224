@@ -5,8 +5,10 @@
 #include <iostream>
 #include <string>
 
+#include "serde.h"
+
 /// @brief Représente un média, avec un nom et un ficher associé.
-class Media
+class Media : public Serialize, public Deserialize
 {
 private:
     std::string name{};

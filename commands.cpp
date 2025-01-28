@@ -91,6 +91,26 @@ void play(std::string &response, std::string &data, Manager &manager)
     response = "OK";
 }
 
+/// @brief Sauvegarde les médias dans un fichier.
+/// @param response Le string où écrire le résultat.
+/// @param data Le nom du fichier.
+/// @param manager Le manager de média et de groupes.
+void save(std::string &response, std::string &data, Manager &manager)
+{
+    manager.save(data);
+    response = "OK";
+}
+
+/// @brief Charge les médias depuis un fichier.
+/// @param response Le string où écrire le résultat.
+/// @param data Le nom du fichier.
+/// @param manager Le manager de média et de groupes.
+void load(std::string &response, std::string &data, Manager &manager)
+{
+    manager.load(data);
+    response = "OK";
+}
+
 /// @brief Affiche l'aide des commands.
 /// @param response Le string où écrire le résultat.
 /// @param data Inutilisé.
@@ -105,6 +125,8 @@ void help(std::string &response, std::string &data, Manager &manager)
     result << "listmedia \t\t: List all media" << std::endl;
     result << "listgroup \t\t: List all groups" << std::endl;
     result << "play <name> \t\t: Play media <name>" << std::endl;
+    result << "save <filename> \t: Save all medias to file <filename>" << std::endl;
+    result << "load <filename> \t: Load all medias from file <filename>" << std::endl;
     result << "help \t\t\t: Display this help" << std::endl;
 
     response = result.str();
@@ -121,5 +143,7 @@ void init_commands()
     commands["listmedia"] = list_media;
     commands["listgroup"] = list_group;
     commands["play"] = play;
+    commands["save"] = save;
+    commands["load"] = load;
     commands["help"] = help;
 }

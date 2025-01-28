@@ -10,6 +10,9 @@
 #include "video.h"
 #include "movie.h"
 #include "group.h"
+#include "serde.h"
+
+#define MANAGER_SYMB ("manager")
 
 using media_dict = std::map<std::string, std::shared_ptr<Media>>;
 using group_dict = std::map<std::string, std::shared_ptr<Group>>;
@@ -21,7 +24,7 @@ using movie_ptr = std::shared_ptr<Movie>;
 using group_ptr = std::shared_ptr<Group>;
 
 /// @brief Représente un gestionnaire de médias. Permet de créer, supprimer, afficher et jouer des médias et des groupes.
-class Manager
+class Manager : Serialize, Deserialize
 {
 private:
     media_dict medias{};
@@ -88,6 +91,18 @@ public:
     /// @brief Joue un média.
     /// @param name Le nom du média.
     void play_media(std::string name) const;
+
+    std::string serialize(symboles_list &symboles) const override;
+    std::string getSymbole() const override { return MANAGER_SYMB; };
+    void deserialize(std::list<std::string> data, symbole_map symboles) override;
+
+    /// @brief Sauvegarde les médias et les groupes dans un fichier.
+    /// @param filename Le nom du fichier.
+    void save(std::string filename) const;
+
+    /// @brief Charge les médias et les groupes depuis un fichier.
+    /// @param filename Le nom du fichier.
+    void load(std::string filename);
 };
 
 #endif

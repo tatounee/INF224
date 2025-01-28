@@ -2,8 +2,10 @@
 #ifndef INF224_PICTURE_H
 #define INF224_PICTURE_H
 
+#include <string>
 #include <stdint.h>
 #include <iostream>
+#include <algorithm>
 
 #include "media.h"
 
@@ -62,6 +64,36 @@ public:
         cmd += " &";
 
         system(cmd.data());
+    }
+
+    std::string serialize(symboles_list &symboles) const override
+    {
+        if (symboles.end() != std::find(symboles.begin(), symboles.end(), this->getSymbole()))
+            return std::string();
+
+        symboles.push_back(this->getSymbole());
+
+        std::stringstream ss;
+
+        ss << ":" << this->getSymbole() << std::endl;
+        ss << "-Video" << std::endl;
+        ss << "-" << this->getName() << std::endl;
+        ss << "-" << this->getPathname() << std::endl;
+        ss << "-" << this->duration << std::endl;
+
+        return ss.str();
+    };
+
+    std::string getSymbole() const override
+    {
+        return std::string("video_") + this->getName();
+    };
+
+    void deserialize(std::list<std::string> data, symbole_map symboles) override {
+        auto it = data.begin();
+        this->setName(*it++);
+        this->setPathname(*it++);
+        this->setDuration(std::stoi(*it++));
     }
 };
 

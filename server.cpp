@@ -13,12 +13,15 @@ int main()
 
     Manager manager;
 
-    auto ferris = manager.create_picture("ferris", "/home/tatoune/Pictures/ferris/ferris.png", 1124, 588);
-    auto ferrisJE = manager.create_picture("ferrisJE", "/home/tatoune/Pictures/ferris/ferrisJE.png", 1124, 588);
-    auto rust = manager.create_group("Rust");
+    // auto holo = manager.create_picture("holo", "/home/tatoune/Pictures/holofog.png", 1400, 989);
+    // auto ferris = manager.create_picture("ferris", "/home/tatoune/Pictures/ferris/ferris.png", 1124, 588);
+    // auto ferrisJE = manager.create_picture("ferrisJE", "/home/tatoune/Pictures/ferris/ferrisJE.png", 1124, 588);
+    // auto rust = manager.create_group("Rust");
+    // auto variations = manager.create_group("Variations");
 
-    rust->push_back(ferris);
-    rust->push_back(ferrisJE);
+    // rust->push_back(ferris);
+    // rust->push_back(ferrisJE);
+    // variations->push_back(ferrisJE);
 
     // Cree le TCPServer
     auto *server =

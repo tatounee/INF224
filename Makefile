@@ -15,8 +15,8 @@ SERVER = server
 #
 # Fichiers sources (NE PAS METTRE les .h ni les .o seulement les .cpp)
 #
-CLIENT_SOURCES = client.cpp movie.cpp manager.cpp ccsocket.cpp
-SERVER_SOURCES = server.cpp movie.cpp manager.cpp  tcpserver.cpp ccsocket.cpp commands.cpp
+CLIENT_SOURCES = client.cpp movie.cpp manager.cpp ccsocket.cpp serde.cpp
+SERVER_SOURCES = server.cpp movie.cpp manager.cpp tcpserver.cpp ccsocket.cpp commands.cpp serde.cpp
 
 
 #
