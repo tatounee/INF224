@@ -1,3 +1,4 @@
+#include <list>
 
 #include "manager.h"
 
@@ -40,6 +41,24 @@ void Manager::delete_media(std::string name)
     this->medias.erase(name);
 }
 
+void Manager::delete_group(std::string name)
+{
+    auto group = this->groups.find(name);
+
+    if (group == this->groups.end())
+        return;
+
+    std::list<std::string> media_names;
+    for (auto item = group->second->begin(); item != group->second->end(); item++)
+        media_names.push_back((*item)->getName());
+
+    for (auto media_name : media_names)
+        group->second->remove_if([media_name](media_ptr media)
+                                 { return media_name == media->getName(); });
+
+    this->groups.erase(name);
+}
+
 void Manager::display_media(std::string name, std::ostream &sout) const
 {
     auto media = this->medias.find(name);
@@ -62,6 +81,24 @@ void Manager::display_group(std::string name, std::ostream &sout) const
     }
 
     group->second->display(sout);
+}
+
+std::list<std::string> Manager::list_media() const
+{
+    std::list<std::string> media_names;
+    for (auto &media : this->medias)
+        media_names.push_back(media.first);
+
+    return media_names;
+}
+
+std::list<std::string> Manager::list_group() const
+{
+    std::list<std::string> group_names;
+    for (auto &group : this->groups)
+        group_names.push_back(group.first);
+
+    return group_names;
 }
 
 void Manager::play_media(std::string name) const

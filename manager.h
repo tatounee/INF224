@@ -60,8 +60,6 @@ public:
     /// @return Un pointeur partagé vers le groupe.
     group_ptr create_group(std::string name);
 
-    /// @brief Supprime un média gérer par le manager.
-    void delete_media(std::string name);
 
     /// @brief Affiche les informations d'un média.
     /// @param name Le nom du média.
@@ -72,6 +70,20 @@ public:
     /// @param name Le nom du groupe.
     /// @param sout Le flux de sortie.
     void display_group(std::string name, std::ostream &sout) const;
+
+    /// @brief Supprime un média gérer par le manager.
+    void delete_media(std::string name);
+
+    /// @brief Supprime un groupe gérer par le manager.
+    void delete_group(std::string name);
+
+    /// @brief Liste les médias gérer par le manager.
+    /// @return La liste des noms des médias.
+    std::list<std::string> list_media() const;
+
+    /// @brief Liste les groupes gérer par le manager.
+    /// @return La liste des noms des groupes.
+    std::list<std::string> list_group() const;
 
     /// @brief Joue un média.
     /// @param name Le nom du média.
