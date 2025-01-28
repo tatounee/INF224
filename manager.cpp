@@ -3,28 +3,28 @@
 
 picture_ptr Manager::create_picture(std::string name, std::string pathname, uint32_t width, uint32_t height)
 {
-    picture_ptr picture = std::make_shared<Picture>(name, pathname, width, height);
+    picture_ptr picture = Picture::new_shared(name, pathname, width, height);
     this->medias[name] = picture;
     return picture;
 }
 
 video_ptr Manager::create_video(std::string name, std::string pathname, uint32_t duration)
 {
-    video_ptr video = std::make_shared<Video>(name, pathname, duration);
+    video_ptr video = Video::new_shared(name, pathname, duration);
     this->medias[name] = video;
     return video;
 }
 
 movie_ptr Manager::create_movie(std::string name, std::string pathname, uint32_t duration, uint32_t *chapters, uint32_t chaptersLength)
 {
-    movie_ptr movie = std::make_shared<Movie>(name, pathname, duration, chapters, chaptersLength);
+    movie_ptr movie = Movie::new_shared(name, pathname, duration, chapters, chaptersLength);
     this->medias[name] = movie;
     return movie;
 }
 
 group_ptr Manager::create_group(std::string name)
 {
-    group_ptr group = std::make_shared<Group>(name);
+    group_ptr group = Group::new_shared(name);
     this->groups[name] = group;
     return group;
 }

@@ -33,8 +33,19 @@ protected:
         uint32_t width, uint32_t height) : Media(name, pathname),
                                            width{width},
                                            height{height} {};
-public:
 
+    static std::shared_ptr<Picture> new_shared(std::string name, std::string pathname, uint32_t width, uint32_t height)
+    {
+        struct NonProtectedPicture : public Picture
+        {
+        public:
+            NonProtectedPicture(std::string name, std::string pathname, uint32_t width, uint32_t height) : Picture(name, pathname, width, height) {}
+        };
+
+        return std::static_pointer_cast<Picture>(std::make_shared<NonProtectedPicture>(name, pathname, width, height));
+    }
+
+public:
     uint32_t getWidth() { return this->width; };
     uint32_t getHeight() { return this->height; };
 

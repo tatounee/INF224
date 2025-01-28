@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <stdint.h>
+#include <memory>
 
 #include "video.h"
 
@@ -38,9 +39,19 @@ protected:
         this->setChapters(chapters, chaptersLength);
     };
 
-public:
+    static std::shared_ptr<Movie> new_shared(std::string name, std::string pathname, uint32_t duration, uint32_t *chapters, uint32_t chaptersLength)
+    {
+        struct NonProtectedMovie : public Movie
+        {
+        public:
+            NonProtectedMovie(std::string name, std::string pathname, uint32_t duration, uint32_t *chapters, uint32_t chaptersLength) : Movie(name, pathname, duration, chapters, chaptersLength) {}
+        };
 
-    Movie(const Movie& from);
+        return std::static_pointer_cast<Movie>(std::make_shared<NonProtectedMovie>(name, pathname, duration, chapters, chaptersLength));
+    }
+
+public:
+    Movie(const Movie &from);
     Movie &operator=(const Movie &from);
 
     ~Movie()

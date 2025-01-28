@@ -29,8 +29,19 @@ protected:
           std::string pathname,
           uint32_t duration) : Media(name, pathname),
                                duration{duration} {};
-public:
 
+    static std::shared_ptr<Video> new_shared(std::string name, std::string pathname, uint32_t duration)
+    {
+        struct NonProtectedVideo : public Video
+        {
+        public:
+            NonProtectedVideo(std::string name, std::string pathname, uint32_t duration) : Video(name, pathname, duration) {}
+        };
+
+        return std::static_pointer_cast<Video>(std::make_shared<NonProtectedVideo>(name, pathname, duration));
+    }
+
+public:
     uint32_t getDuration() const { return this->duration; };
     void setDuration(uint32_t duration) { this->duration = duration; };
 
