@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <stdexcept>
 
 #include "picture.h"
 #include "video.h"
@@ -23,8 +24,37 @@ using video_ptr = std::shared_ptr<Video>;
 using movie_ptr = std::shared_ptr<Movie>;
 using group_ptr = std::shared_ptr<Group>;
 
+enum manager_error
+{
+    NONE = 0,
+    MEDIA_NOT_FOUND,
+    GROUP_NOT_FOUND,
+    MEDIA_ALREADY_EXISTS,
+    GROUP_ALREADY_EXISTS,
+    UNABLE_TO_OPEN_FILE,
+};
+
+class ManagerError : public std::runtime_error
+{
+public:
+    ManagerError(const std::string &message) : std::runtime_error(message) {};
+};
+
+class NameAlreadyTaken : public ManagerError
+{
+public:
+    NameAlreadyTaken(const std::string &name)
+        : ManagerError("Name \"" + name + "\" is already taken") {}
+
+    const char *what() const noexcept override
+    {
+        return ManagerError::what();
+    }
+};
+
 /// @brief Représente un gestionnaire de médias. Permet de créer, supprimer, afficher et jouer des médias et des groupes.
-class Manager : Serialize, Deserialize
+class Manager : Serialize,
+                Deserialize
 {
 private:
     media_dict medias{};
@@ -67,18 +97,24 @@ public:
     /// @brief Affiche les informations d'un média.
     /// @param name Le nom du média.
     /// @param sout Le flux de sortie.
-    void display_media(std::string name, std::ostream &sout) const;
+    /// @return `manager_error::MEDIA_NOT_FOUND` si le média n'existe pas, `manager_error::NONE` sinon.
+    manager_error display_media(std::string name, std::ostream &sout) const;
 
     /// @brief Affiche les informations d'un groupe.
     /// @param name Le nom du groupe.
     /// @param sout Le flux de sortie.
-    void display_group(std::string name, std::ostream &sout) const;
+    /// @return `manager_error::GROUP_NOT_FOUND` si le groupe n'existe pas, `manager_error::NONE` sinon.
+    manager_error display_group(std::string name, std::ostream &sout) const;
 
     /// @brief Supprime un média gérer par le manager.
-    void delete_media(std::string name);
+    /// @param name Le nom du média.
+    /// @return `manager_error::MEDIA_NOT_FOUND` si le média n'existe pas, `manager_error::NONE` sinon.
+    manager_error delete_media(std::string name);
 
     /// @brief Supprime un groupe gérer par le manager.
-    void delete_group(std::string name);
+    /// @param name Le nom du groupe.
+    /// @return `manager_error::GROUP_NOT_FOUND` si le groupe n'existe pas, `manager_error::NONE` sinon.
+    manager_error delete_group(std::string name);
 
     /// @brief Liste les médias gérer par le manager.
     /// @return La liste des noms des médias.
@@ -90,7 +126,8 @@ public:
 
     /// @brief Joue un média.
     /// @param name Le nom du média.
-    void play_media(std::string name) const;
+    /// @return `manager_error::MEDIA_NOT_FOUND` si le média n'existe pas, `manager_error::NONE` sinon.
+    manager_error play_media(std::string name) const;
 
     void serialize(symboles_map &symboles) const override;
     std::string getSymbole() const override { return MANAGER_SYMB; };
@@ -98,11 +135,13 @@ public:
 
     /// @brief Sauvegarde les médias et les groupes dans un fichier.
     /// @param filename Le nom du fichier.
-    void save(std::string filename) const;
+    /// @return `manager_error::UNABLE_TO_OPEN_FILE` si le fichier ne peut pas être ouvert, `manager_error::NONE` sinon.
+    manager_error save(std::string filename) const;
 
     /// @brief Charge les médias et les groupes depuis un fichier.
     /// @param filename Le nom du fichier.
-    void load(std::string filename);
+    /// @return `manager_error::UNABLE_TO_OPEN_FILE` si le fichier ne peut pas être ouvert, `manager_error::NONE` sinon.
+    manager_error load(std::string filename);
 };
 
 #endif

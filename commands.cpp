@@ -12,10 +12,12 @@
 void find_media(std::string &response, std::string &data, Manager &manager)
 {
     std::stringstream result = {};
-    manager.display_media(data, result);
+    auto error = manager.display_media(data, result);
 
-    response = result.str();
-    std::replace(response.begin(), response.end(), '\n', ';');
+    if (error == manager_error::MEDIA_NOT_FOUND)
+        result << "Media \"" << data << "\" not found." << std::endl;
+    else
+        response = result.str();
 }
 
 /// @brief Recherche un groupe et l'affiche dans `response`.
@@ -25,10 +27,12 @@ void find_media(std::string &response, std::string &data, Manager &manager)
 void find_group(std::string &response, std::string &data, Manager &manager)
 {
     std::stringstream result = {};
-    manager.display_group(data, result);
+    auto error = manager.display_group(data, result);
 
-    response = result.str();
-    std::replace(response.begin(), response.end(), '\n', ';');
+    if (error == manager_error::GROUP_NOT_FOUND)
+        result << "Group \"" << data << "\" not found." << std::endl;
+    else
+        response = result.str();
 }
 
 /// @brief Supprime un média.
@@ -37,8 +41,12 @@ void find_group(std::string &response, std::string &data, Manager &manager)
 /// @param manager Le manager de média et de groupes.
 void delete_media(std::string &response, std::string &data, Manager &manager)
 {
-    manager.delete_media(data);
-    response = "OK";
+    auto error = manager.delete_media(data);
+
+    if (error == manager_error::MEDIA_NOT_FOUND)
+        response = "Media \"" + data + "\" not found.\n";
+    else
+        response = "OK";
 }
 
 /// @brief Supprime un groupe.
@@ -47,8 +55,12 @@ void delete_media(std::string &response, std::string &data, Manager &manager)
 /// @param manager Le manager de média et de groupes.
 void delete_group(std::string &response, std::string &data, Manager &manager)
 {
-    manager.delete_group(data);
-    response = "OK";
+    auto error = manager.delete_group(data);
+
+    if (error == manager_error::GROUP_NOT_FOUND)
+        response = "Group \"" + data + "\" not found.\n";
+    else
+        response = "OK";
 }
 
 /// @brief Liste tous les médias.
@@ -63,7 +75,6 @@ void list_media(std::string &response, std::string &data, Manager &manager)
         result << media_name << std::endl;
 
     response = result.str();
-    std::replace(response.begin(), response.end(), '\n', ';');
 }
 
 /// @brief Liste tous les groupes.
@@ -78,7 +89,6 @@ void list_group(std::string &response, std::string &data, Manager &manager)
         result << group_name << std::endl;
 
     response = result.str();
-    std::replace(response.begin(), response.end(), '\n', ';');
 }
 
 /// @brief Joue un média.
@@ -87,8 +97,12 @@ void list_group(std::string &response, std::string &data, Manager &manager)
 /// @param manager Le manager de média et de groupes.
 void play(std::string &response, std::string &data, Manager &manager)
 {
-    manager.play_media(data);
-    response = "OK";
+    auto error = manager.play_media(data);
+
+    if (error == manager_error::MEDIA_NOT_FOUND)
+        response = "Media \"" + data + "\" not found.\n";
+    else
+        response = "OK";
 }
 
 /// @brief Sauvegarde les médias dans un fichier.
@@ -97,8 +111,12 @@ void play(std::string &response, std::string &data, Manager &manager)
 /// @param manager Le manager de média et de groupes.
 void save(std::string &response, std::string &data, Manager &manager)
 {
-    manager.save(data);
-    response = "OK";
+    auto error = manager.save(data);
+
+    if (error == manager_error::UNABLE_TO_OPEN_FILE)
+        response = "Unable to open file \"" + data + "\".\n";
+    else
+        response = "OK";
 }
 
 /// @brief Charge les médias depuis un fichier.
@@ -107,8 +125,12 @@ void save(std::string &response, std::string &data, Manager &manager)
 /// @param manager Le manager de média et de groupes.
 void load(std::string &response, std::string &data, Manager &manager)
 {
-    manager.load(data);
-    response = "OK";
+    auto error = manager.load(data);
+
+    if (error == manager_error::UNABLE_TO_OPEN_FILE)
+        response = "Unable to open file \"" + data + "\".\n";
+    else
+        response = "OK";
 }
 
 /// @brief Affiche l'aide des commands.

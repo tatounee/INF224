@@ -12,6 +12,10 @@
 
 picture_ptr Manager::create_picture(std::string name, std::string pathname, uint32_t width, uint32_t height)
 {
+    auto media = this->medias.find(name);
+    if (media != this->medias.end())
+        throw NameAlreadyTaken(name);
+
     picture_ptr picture = Picture::new_shared(name, pathname, width, height);
     this->medias[name] = picture;
     return picture;
@@ -19,6 +23,10 @@ picture_ptr Manager::create_picture(std::string name, std::string pathname, uint
 
 video_ptr Manager::create_video(std::string name, std::string pathname, uint32_t duration)
 {
+    auto media = this->medias.find(name);
+    if (media != this->medias.end())
+        throw NameAlreadyTaken(name);
+
     video_ptr video = Video::new_shared(name, pathname, duration);
     this->medias[name] = video;
     return video;
@@ -26,6 +34,10 @@ video_ptr Manager::create_video(std::string name, std::string pathname, uint32_t
 
 movie_ptr Manager::create_movie(std::string name, std::string pathname, uint32_t duration, uint32_t *chapters, uint32_t chaptersLength)
 {
+    auto media = this->medias.find(name);
+    if (media != this->medias.end())
+        throw NameAlreadyTaken(name);
+
     movie_ptr movie = Movie::new_shared(name, pathname, duration, chapters, chaptersLength);
     this->medias[name] = movie;
     return movie;
@@ -33,28 +45,34 @@ movie_ptr Manager::create_movie(std::string name, std::string pathname, uint32_t
 
 group_ptr Manager::create_group(std::string name)
 {
+    auto group_ = this->groups.find(name);
+    if (group_ != this->groups.end())
+        throw NameAlreadyTaken(name);
+
     group_ptr group = Group::new_shared(name);
     this->groups[name] = group;
     return group;
 }
 
-void Manager::delete_media(std::string name)
+manager_error Manager::delete_media(std::string name)
 {
+    auto deleted = this->medias.erase(name);
+    if (deleted == 0)
+        return manager_error::MEDIA_NOT_FOUND;
+
     for (auto &group : this->groups)
-    {
         group.second->remove_if([name](media_ptr media)
                                 { return name == media->getName(); });
-    }
 
-    this->medias.erase(name);
+    return manager_error::NONE;
 }
 
-void Manager::delete_group(std::string name)
+manager_error Manager::delete_group(std::string name)
 {
     auto group = this->groups.find(name);
 
     if (group == this->groups.end())
-        return;
+        return manager_error::GROUP_NOT_FOUND;
 
     std::list<std::string> media_names;
     for (auto item = group->second->begin(); item != group->second->end(); item++)
@@ -65,30 +83,30 @@ void Manager::delete_group(std::string name)
                                  { return media_name == media->getName(); });
 
     this->groups.erase(name);
+
+    return manager_error::NONE;
 }
 
-void Manager::display_media(std::string name, std::ostream &sout) const
+manager_error Manager::display_media(std::string name, std::ostream &sout) const
 {
     auto media = this->medias.find(name);
     if (media == this->medias.end())
-    {
-        sout << "Media \"" << name << "\" not found." << std::endl;
-        return;
-    }
+        return manager_error::MEDIA_NOT_FOUND;
 
     media->second->display(sout);
+
+    return manager_error::NONE;
 }
 
-void Manager::display_group(std::string name, std::ostream &sout) const
+manager_error Manager::display_group(std::string name, std::ostream &sout) const
 {
     auto group = this->groups.find(name);
     if (group == this->groups.end())
-    {
-        sout << "Group \"" << name << "\" not found." << std::endl;
-        return;
-    }
+        return manager_error::GROUP_NOT_FOUND;
 
     group->second->display(sout);
+
+    return manager_error::NONE;
 }
 
 std::list<std::string> Manager::list_media() const
@@ -109,16 +127,15 @@ std::list<std::string> Manager::list_group() const
     return group_names;
 }
 
-void Manager::play_media(std::string name) const
+manager_error Manager::play_media(std::string name) const
 {
     auto media = this->medias.find(name);
     if (media == this->medias.end())
-    {
-        std::cerr << "Media \"" << name << "\" not found." << std::endl;
-        return;
-    }
+        return manager_error::MEDIA_NOT_FOUND;
 
     media->second->play();
+
+    return manager_error::NONE;
 }
 
 void Manager::serialize(symboles_map &symboles) const
@@ -226,15 +243,12 @@ void Manager::deserialize(serde_data_t serde_data, symboles_map symboles)
     }
 }
 
-void Manager::save(std::string filename) const
+manager_error Manager::save(std::string filename) const
 {
     std::ofstream file(filename);
 
     if (!file.is_open())
-    {
-        std::cerr << "Could not open file \"" << filename << "\"." << std::endl;
-        return;
-    }
+        return manager_error::UNABLE_TO_OPEN_FILE;
 
     symboles_map symboles;
     this->serialize(symboles);
@@ -242,17 +256,16 @@ void Manager::save(std::string filename) const
     serializer(file, symboles);
 
     file.close();
+
+    return manager_error::NONE;
 }
 
-void Manager::load(const std::string filename)
+manager_error Manager::load(const std::string filename)
 {
     std::ifstream file = std::ifstream(filename);
 
     if (!file.is_open())
-    {
-        std::cerr << "Could not open file \"" << filename << "\"." << std::endl;
-        return;
-    }
+        return manager_error::UNABLE_TO_OPEN_FILE;
 
     symboles_map symboles;
     deserializer(file, symboles);
@@ -261,4 +274,6 @@ void Manager::load(const std::string filename)
     this->deserialize(symboles[MANAGER_SYMB], symboles);
 
     file.close();
+
+    return manager_error::NONE;
 }
