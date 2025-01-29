@@ -76,7 +76,7 @@ public:
         for (auto &media : *this)
         {
             if (i++ > 0)
-                ss << ",";
+                ss << " ";
             ss << media->getSymbole();
 
             media_ss << media->serialize(symboles);
@@ -90,7 +90,10 @@ public:
 
     std::string getSymbole() const override
     {
-        return std::string("group_") + this->name;
+        auto name = this->getName();
+        std::replace(name.begin(), name.end(), ' ', '_');
+
+        return std::string("group_") + name;
     };
 
     void deserialize(std::list<std::string> data, symbole_map symboles) override
@@ -102,7 +105,7 @@ public:
         std::string name;
 
         std::stringstream medias_ss(*it++);
-        std::getline(medias_ss, name, ',');
+        std::getline(medias_ss, name, ' ');
         while (name != "")
         {
             serde_data_t symbole_data = symboles[name];
@@ -116,7 +119,7 @@ public:
                 std::cerr << "Media " << name << " not initialized." << std::endl;
 
             name.clear();
-            std::getline(medias_ss, name, ',');
+            std::getline(medias_ss, name, ' ');
         }
     }
 };

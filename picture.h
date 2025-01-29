@@ -97,7 +97,10 @@ public:
 
     std::string getSymbole() const override
     {
-        return std::string("picture_") + this->getName();
+        auto name = this->getName();
+        std::replace(name.begin(), name.end(), ' ', '_');
+
+        return std::string("picture_") + name;
     }
 
     void deserialize(std::list<std::string> data, symbole_map symboles) override

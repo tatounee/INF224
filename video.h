@@ -86,10 +86,14 @@ public:
 
     std::string getSymbole() const override
     {
-        return std::string("video_") + this->getName();
+        auto name = this->getName();
+        std::replace(name.begin(), name.end(), ' ', '_');
+
+        return std::string("video_") + name;
     };
 
-    void deserialize(std::list<std::string> data, symbole_map symboles) override {
+    void deserialize(std::list<std::string> data, symbole_map symboles) override
+    {
         auto it = data.begin();
         this->setName(*it++);
         this->setPathname(*it++);

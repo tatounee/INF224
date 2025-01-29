@@ -117,7 +117,7 @@ void Movie::deserialize(std::list<std::string> data, symbole_map symboles)
     for (size_t i = 0; i < this->chaptersLength; i++)
     {
         std::string chapter;
-        std::getline(ss, chapter, ',');
+        std::getline(ss, chapter, ' ');
         this->chapters[i] = std::stoi(chapter);
     }
 }

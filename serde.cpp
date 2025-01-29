@@ -51,7 +51,7 @@ symbole_map parse_symboles(std::istream &data)
 void print_symboles(symboles_list &symboles)
 {
     for (auto &symbole : symboles)
-        std::cout << symbole << " " << std::endl;
+        std::cout << symbole << ' ' << std::endl;
 }
 
 void print_symboles_map(symbole_map &symboles)

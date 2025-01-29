@@ -136,7 +136,7 @@ std::string Manager::serialize(symboles_list &symboles) const
     for (auto &group : this->groups)
     {
         if (i++ > 0)
-            ss << ",";
+            ss << ' ';
         ss << group.second->getSymbole();
 
         group_media_ss << group.second->serialize(symboles);
@@ -149,7 +149,7 @@ std::string Manager::serialize(symboles_list &symboles) const
     for (auto &media : this->medias)
     {
         if (i++ > 0)
-            ss << ",";
+            ss << ' ';
         ss << media.second->getSymbole();
 
         group_media_ss << media.second->serialize(symboles);
@@ -187,7 +187,7 @@ void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
     std::string name;
 
     std::stringstream media_ss(media_list);
-    std::getline(media_ss, name, ',');
+    std::getline(media_ss, name, ' ');
     while (name != "")
     {
         serde_data_t symbole_data = symboles[name];
@@ -218,11 +218,11 @@ void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
         }
 
         name.clear();
-        std::getline(media_ss, name, ',');
+        std::getline(media_ss, name, ' ');
     }
 
     std::stringstream groups_ss(group_list);
-    std::getline(groups_ss, name, ',');
+    std::getline(groups_ss, name, ' ');
     while (name != "")
     {
         serde_data_t symbole_data = symboles[name];
@@ -243,7 +243,7 @@ void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
         }
 
         name.clear();
-        std::getline(groups_ss, name, ',');
+        std::getline(groups_ss, name, ' ');
     }
 }
 
