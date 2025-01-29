@@ -7,6 +7,7 @@
 
 #include "media.h"
 
+/// @brief Représente une image, avec un nom, un fichier associé, une largeur et une hauteur.
 class Picture : public Media
 {
 private:
@@ -14,7 +15,13 @@ private:
     uint32_t height{};
 
 public:
+    /// @brief Constructeur par défaut.
     Picture() {};
+    /// @brief Constructeur avec paramètres.
+    /// @param name Le nom de l'image.
+    /// @param pathname Le chemin du fichier associé.
+    /// @param width La largeur de l'image.
+    /// @param height La hauteur de l'image.
     Picture(std::string name, std::string pathname, uint32_t width, uint32_t height) : Media(name, pathname)
     {
         this->width = width;
@@ -27,6 +34,8 @@ public:
     void setWidth(uint32_t width) { this->width = width; };
     void setHeight(uint32_t height) { this->height = height; };
 
+    /// @brief Affiche les informations de l'image.
+    /// @param sout
     void display(std::ostream &sout) const
     {
         sout << "[Picture]" << std::endl
@@ -36,7 +45,9 @@ public:
              << "\theight: \"" << this->height << "\"\n";
     }
 
-    void play() {
+    /// @brief Affiche l'image avec `imagej`.
+    void play()
+    {
         std::string cmd = std::string("imagej ");
         cmd += this->getPathname();
         cmd += " &";
