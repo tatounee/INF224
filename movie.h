@@ -8,6 +8,7 @@
 
 #include "video.h"
 
+/// @brief Représente un film, avec un nom, un fichier associé, une durée et des chapitres.
 class Movie : public Video
 {
 public:
@@ -15,7 +16,14 @@ public:
     size_t chaptersLength{};
 
 public:
+    /// @brief Constructeur par défaut.
     Movie() {};
+
+    /// @brief Constructeur avec paramètres.
+    /// @param name Le nom du film.
+    /// @param pathname Le chemin du fichier associé.
+    /// @param duration La durée du film.
+    /// @param chapters Les chapitres du film.
     Movie(
         std::string name,
         std::string pathname,
@@ -38,6 +46,7 @@ public:
 
     void setChapters(const uint32_t *chapters, uint32_t chaptersLength);
 
+    /// @brief Affiche les informations du film.
     void display(std::ostream &sout) const;
 };
 
