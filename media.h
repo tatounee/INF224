@@ -13,7 +13,12 @@ private:
     std::string pathname{};
 
 public:
+    /// @brief Constructeur par défaut.
     Media() : name(std::string()), pathname(std::string()) {};
+
+    /// @brief  Constructeur avec paramètres.
+    /// @param name Le nom du média.
+    /// @param pathname Le chemin du fichier associé.
     Media(std::string name, std::string pathname);
 
     std::string getName() const;
@@ -22,6 +27,8 @@ public:
     void setName(std::string name);
     void setPathname(std::string name);
 
+    /// @brief Affiche les informations du média.
+    /// @param sout Le flux de sortie.
     void display(std::ostream &sout) const;
 };
 
