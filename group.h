@@ -93,29 +93,43 @@ public:
 
     void deserialize(serde_data_t serde_data, symboles_map symboles) override
     {
-        auto it = serde_data.data.begin();
-        auto nnn = *it++;
-        this->setName(nnn);
+        if (serde_data.class_name != "Group")
+            throw WrongClass("Group", serde_data.class_name);
 
-        std::string name;
+        if (serde_data.data.size() != 2)
+            throw NotEnoughData("Group", 2, serde_data.data.size());
+
+        auto it = serde_data.data.begin();
+
+        std::string name = *it++;
+        std::list<std::shared_ptr<Media>> media_list;
 
         std::stringstream medias_ss(*it++);
-        std::getline(medias_ss, name, ' ');
-        while (name != "")
+        std::string media_name;
+        std::getline(medias_ss, media_name, ' ');
+
+        while (media_name != "")
         {
-            serde_data_t symbole_data = symboles[name];
+            if (symboles.find(media_name) == symboles.end())
+                throw UndefinedSymbole(media_name);
+
+            serde_data_t symbole_data = symboles[media_name];
 
             if (symbole_data.initialized_ptr != nullptr)
             {
                 std::shared_ptr<Media> *media = (std::shared_ptr<Media> *)symbole_data.initialized_ptr;
-                this->push_back(*media);
+                media_list.push_back(*media);
             }
             else
-                std::cerr << "Media " << name << " not initialized." << std::endl;
+                throw ObjectMustBeInitialized("Media", media_name);
 
-            name.clear();
-            std::getline(medias_ss, name, ' ');
+            media_name.clear();
+            std::getline(medias_ss, media_name, ' ');
         }
+
+        this->setName(name);
+        this->clear();
+        this->insert(this->begin(), media_list.begin(), media_list.end());
     }
 };
 

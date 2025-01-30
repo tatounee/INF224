@@ -148,18 +148,6 @@ void Manager::serialize(symboles_map &symboles) const
     data.class_name = "Manager";
 
     int i = 0;
-    std::stringstream groups_ss;
-    for (auto &group : this->groups)
-    {
-        if (i++ > 0)
-            groups_ss << ' ';
-        groups_ss << group.second->getSymbole();
-
-        group.second->serialize(symboles);
-    }
-    data.data.push_back(groups_ss.str());
-
-    i = 0;
     std::stringstream media_ss;
     for (auto &media : this->medias)
     {
@@ -171,45 +159,71 @@ void Manager::serialize(symboles_map &symboles) const
     }
     data.data.push_back(media_ss.str());
 
+    i = 0;
+    std::stringstream groups_ss;
+    for (auto &group : this->groups)
+    {
+        if (i++ > 0)
+            groups_ss << ' ';
+        groups_ss << group.second->getSymbole();
+
+        group.second->serialize(symboles);
+    }
+    data.data.push_back(groups_ss.str());
+
     symboles[MANAGER_SYMB] = data;
 }
 
 void Manager::deserialize(serde_data_t serde_data, symboles_map symboles)
 {
+    if (serde_data.class_name != "Manager")
+        throw WrongClass("Manager", serde_data.class_name);
+
+    if (serde_data.data.size() != 2)
+        throw NotEnoughData("Manager", 2, serde_data.data.size());
+
     auto it = serde_data.data.begin();
-    std::string group_list = *it++;
-    std::string media_list = *it++;
+
+    Manager tmp_manager;
 
     std::string name;
 
-    std::stringstream media_ss(media_list);
+    std::stringstream media_ss(*it++);
     std::getline(media_ss, name, ' ');
     while (name != "")
     {
+        if (symboles.find(name) == symboles.end())
+            throw UndefinedSymbole(name);
+
         serde_data_t symbole_data = symboles[name];
 
         if (symbole_data.initialized_ptr != nullptr)
         {
             std::shared_ptr<Media> *media = (std::shared_ptr<Media> *)symbole_data.initialized_ptr;
-            this->medias[name] = *media;
+            tmp_manager.medias[name] = *media;
         }
         else
         {
             media_ptr media;
 
             if (symbole_data.class_name == "Picture")
-                media = this->create_picture(TMP_KEY, {}, {}, {});
+                media = tmp_manager.create_picture(TMP_KEY, {}, {}, {});
             else if (symbole_data.class_name == "Video")
-                media = this->create_video(TMP_KEY, {}, {});
+                media = tmp_manager.create_video(TMP_KEY, {}, {});
             else if (symbole_data.class_name == "Movie")
-                media = this->create_movie(TMP_KEY, {}, {}, {}, {});
+                media = tmp_manager.create_movie(TMP_KEY, {}, {}, {}, {});
+            else
+                throw WrongClass("Picture, Video or Movie", symbole_data.class_name);
+
+            tmp_manager.medias.erase(TMP_KEY);
 
             (*media).deserialize(symbole_data, symboles);
-            this->medias.erase(TMP_KEY);
-            this->medias[media->getName()] = media;
+            tmp_manager.medias.erase(TMP_KEY);
+            tmp_manager.medias[media->getName()] = media;
 
-            // symboles[name].initialized_ptr = (void *)&media;
-            symbole_data.initialized_ptr = (void *)(&this->medias[media->getName()]);
+            tmp_manager.medias[media->getName()] = media;
+
+            symbole_data.initialized_ptr = (void *)(&tmp_manager.medias[media->getName()]);
             symboles[name] = symbole_data;
         }
 
@@ -217,23 +231,26 @@ void Manager::deserialize(serde_data_t serde_data, symboles_map symboles)
         std::getline(media_ss, name, ' ');
     }
 
-    std::stringstream groups_ss(group_list);
+    std::stringstream groups_ss(*it++);
     std::getline(groups_ss, name, ' ');
     while (name != "")
     {
+        if (symboles.find(name) == symboles.end())
+            throw UndefinedSymbole(name);
+
         serde_data_t symbole_data = symboles[name];
 
         if (symbole_data.initialized_ptr != nullptr)
         {
             std::shared_ptr<Group> *group = (std::shared_ptr<Group> *)symbole_data.initialized_ptr;
-            this->groups[name] = *group;
+            tmp_manager.groups[name] = *group;
         }
         else
         {
-            group_ptr group = this->create_group(name);
+            group_ptr group = tmp_manager.create_group(name);
             (*group).deserialize(symbole_data, symboles);
-            this->groups.erase(name);
-            this->groups[group->getName()] = group;
+            tmp_manager.groups.erase(name);
+            tmp_manager.groups[group->getName()] = group;
 
             symbole_data.initialized_ptr = (void *)&group;
         }
@@ -241,6 +258,9 @@ void Manager::deserialize(serde_data_t serde_data, symboles_map symboles)
         name.clear();
         std::getline(groups_ss, name, ' ');
     }
+
+    this->medias = tmp_manager.medias;
+    this->groups = tmp_manager.groups;
 }
 
 manager_error Manager::save(std::string filename) const

@@ -1,0 +1,36 @@
+:group_Rust
+-Group
+-Rust
+-picture_ferris picture_ferrisJE
+:group_Variations
+-Group
+-Variations
+-picture_ferrisJE
+:manager
+-Manager
+-picture_ferris picture_ferrisJE video_holo movie_holo2
+-group_Rust group_Variations
+:movie_holo2
+-Movie
+-holo2
+-/home/tatoune/Pictures/holofog.png
+-15
+-2
+-5 10
+:picture_ferris
+-Picture
+-ferris
+-/home/tatoune/Pictures/ferris/ferris.png
+-1124
+-588
+:picture_ferrisJE
+-Picture
+-ferrisJE
+-/home/tatoune/Pictures/ferris/ferrisJE.png
+-1124
+-588
+:video_holo
+-Video
+-holo
+-/home/tatoune/Pictures/holofog.png
+-15

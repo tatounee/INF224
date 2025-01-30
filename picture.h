@@ -102,11 +102,40 @@ public:
 
     void deserialize(serde_data_t serde_data, symboles_map symboles) override
     {
+        if (serde_data.class_name != "Picture")
+            throw WrongClass("Picture", serde_data.class_name);
+
+        if (serde_data.data.size() != 4)
+            throw NotEnoughData("Picture", 4, serde_data.data.size());
+
         auto it = serde_data.data.begin();
-        this->setName(*it++);
-        this->setPathname(*it++);
-        this->setWidth(std::stoi(*it++));
-        this->setHeight(std::stoi(*it++));
+
+        std::string name = *it;
+        std::string pathname = *++it;
+        uint32_t width, height;
+
+        try
+        {
+            width = std::stoi(*++it);
+        }
+        catch (const std::exception &e)
+        {
+            throw CanNotInterpretData("Picture", "uint32_t", *it);
+        }
+
+        try
+        {
+            height = std::stoi(*++it);
+        }
+        catch (const std::exception &e)
+        {
+            throw CanNotInterpretData("Picture", "uint32_t", *it);
+        }
+
+        this->setName(name);
+        this->setPathname(pathname);
+        this->setWidth(width);
+        this->setHeight(height);
     }
 };
 

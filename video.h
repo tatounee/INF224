@@ -91,10 +91,30 @@ public:
 
     void deserialize(serde_data_t serde_data, symboles_map symboles) override
     {
+        if (serde_data.class_name != "Video")
+            throw WrongClass("Video", serde_data.class_name);
+
+        if (serde_data.data.size() != 3)
+            throw NotEnoughData("Video", 3, serde_data.data.size());
+
         auto it = serde_data.data.begin();
-        this->setName(*it++);
-        this->setPathname(*it++);
-        this->setDuration(std::stoi(*it++));
+
+        std::string name = *it;
+        std::string pathname = *++it;
+        uint32_t duration;
+
+        try
+        {
+            duration = std::stoi(*++it);
+        }
+        catch (const std::exception &e)
+        {
+            throw CanNotInterpretData("Video", "uint32_t", *it);
+        }
+
+        this->setName(name);
+        this->setPathname(pathname);
+        this->setDuration(duration);
     }
 };
 

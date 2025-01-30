@@ -16,8 +16,8 @@ void find_media(std::string &response, std::string &data, Manager &manager)
 
     if (error == manager_error::MEDIA_NOT_FOUND)
         result << "Media \"" << data << "\" not found." << std::endl;
-    else
-        response = result.str();
+
+    response = result.str();
 }
 
 /// @brief Recherche un groupe et l'affiche dans `response`.
@@ -31,8 +31,8 @@ void find_group(std::string &response, std::string &data, Manager &manager)
 
     if (error == manager_error::GROUP_NOT_FOUND)
         result << "Group \"" << data << "\" not found." << std::endl;
-    else
-        response = result.str();
+
+    response = result.str();
 }
 
 /// @brief Supprime un média.
@@ -125,12 +125,19 @@ void save(std::string &response, std::string &data, Manager &manager)
 /// @param manager Le manager de média et de groupes.
 void load(std::string &response, std::string &data, Manager &manager)
 {
-    auto error = manager.load(data);
+    try
+    {
+        auto error = manager.load(data);
 
-    if (error == manager_error::UNABLE_TO_OPEN_FILE)
-        response = "Unable to open file \"" + data + "\".\n";
-    else
-        response = "OK";
+        if (error == manager_error::UNABLE_TO_OPEN_FILE)
+            response = "Unable to open file \"" + data + "\".\n";
+        else
+            response = "OK";
+    }
+    catch (const SerdeError &e)
+    {
+        response = e.what();
+    }
 }
 
 /// @brief Affiche l'aide des commands.

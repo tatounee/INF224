@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <stdexcept>
 
 /// @brief Structure des données de sérialisation/desérialisation.
 /// @details Pour plus d'informations, voir `serde.h`.
@@ -32,6 +33,80 @@ typedef struct serde_data
 /// @brief Dictionnaire des symboles et leurs données associées.
 /// @details Pour plus d'informations, voir `serde.h`.
 typedef std::map<std::string, serde_data_t> symboles_map;
+
+/// @brief Erreur de sérialisation/désérialisation.
+class SerdeError : public std::runtime_error
+{
+public:
+    SerdeError(const std::string &message) : std::runtime_error(message) {};
+};
+
+/// @brief Cette erreur est levée lorsqu'il n'y a pas assez de données pour désérialiser un objet.
+class NotEnoughData : public SerdeError
+{
+public:
+    NotEnoughData(const std::string &class_name, const int &expected, const int &got)
+        : SerdeError(
+              "Not enough data for deserialize class " + class_name + ". Expected " + std::to_string(expected) + " but got " + std::to_string(got) + ".") {}
+
+    const char *what() const noexcept override
+    {
+        return SerdeError::what();
+    }
+};
+
+/// @brief Cette erreur est levée lorqu'une donnée ne peut pas être interprétée.
+class CanNotInterpretData : public SerdeError
+{
+public:
+    CanNotInterpretData(const std::string &class_name, const std::string &expected, const std::string &value)
+        : SerdeError(
+              "Can not interpret data for deserialize class " + class_name + ". Expected " + expected + " but can not interpret \"" + value + "\" as this.") {}
+
+    const char *what() const noexcept override
+    {
+        return SerdeError::what();
+    }
+};
+
+/// @brief Cette erreur est levée lorsqu'un objet dépend d'un autre objet X et que : X n'est pas initialisé, l'objet qu'il ne peut pas initialiser X lui même.
+class ObjectMustBeInitialized : public SerdeError
+{
+public:
+    ObjectMustBeInitialized(const std::string &class_name, const std::string &symbole)
+        : SerdeError("Symbole " + symbole + ", object " + class_name + " must be initialized.") {}
+
+    const char *what() const noexcept override
+    {
+        return SerdeError::what();
+    }
+};
+
+/// @brief Cette erreur est levée lorsqu'un symbole n'est pas défini.
+class UndefinedSymbole : public SerdeError
+{
+public:
+    UndefinedSymbole(const std::string &symbole)
+        : SerdeError("Symbole " + symbole + " is not defined.") {}
+
+    const char *what() const noexcept override
+    {
+        return SerdeError::what();
+    }
+};
+
+/// @brief Cette erreur est levée lorsqu'une donnée à désérialiser ne correspond pas à la classe de l'objet.
+class WrongClass : public SerdeError
+{
+public:
+    WrongClass(const std::string &expected, const std::string &got)
+        : SerdeError("Wrong class for deserialize data. Expected " + expected + " but got " + got + ".") {}
+
+    const char *what() const noexcept override
+    {
+        return SerdeError::what();
+    }
+};
 
 /// @brief Interface de sérialisation.
 class Serialize
@@ -52,6 +127,11 @@ class Deserialize
 {
 public:
     /// @brief Désérialise l'objet à partir des données sérialisées.
+    /// @throw `NotEnoughData` Si les données ne sont pas suffisantes pour désérialiser l'objet.
+    /// @throw `CanNotInterpretData` Si les données ne peuvent pas être interprétées.
+    /// @throw `ObjectMustBeInitialized` Si l'objet dépent d'un autre objet X et que : X n'est pas initialisé, l'objet qu'il ne peut pas initialiser X lui même.
+    /// @throw `UndefinedSymbole` Si un symbole n'est pas défini.
+    /// @throw `WrongClass` Si les donnée à désérialiser ne corresponde pas à la classe de l'objet.
     /// @param data La liste des données sérialisées.
     /// @param symboles La liste des symboles existants, potentiellement déjà désérialisés.
     virtual void deserialize(serde_data_t serde_data, symboles_map symboles) = 0;

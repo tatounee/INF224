@@ -65,6 +65,7 @@ public:
     Manager() : medias(media_dict()), groups(group_dict()) {};
 
     /// @brief Crée une image gérer par le manager.
+    /// @throw `NameAlreadyTaken` Si le nom est déjà pris.
     /// @param name Le nom de l'image.
     /// @param pathname Le chemin du fichier associé.
     /// @param width La largeur de l'image.
@@ -73,6 +74,7 @@ public:
     picture_ptr create_picture(std::string name, std::string pathname, uint32_t width, uint32_t height);
 
     /// @brief Crée une vidéo gérer par le manager.
+    /// @throw `NameAlreadyTaken` Si le nom est déjà pris.
     /// @param name Le nom de la vidéo.
     /// @param pathname Le chemin du fichier associé.
     /// @param duration La durée de la vidéo.
@@ -80,6 +82,7 @@ public:
     video_ptr create_video(std::string name, std::string pathname, uint32_t duration);
 
     /// @brief Crée un film gérer par le manager.
+    /// @throw `NameAlreadyTaken` Si le nom est déjà pris.
     /// @param name Le nom du film.
     /// @param pathname Le chemin du fichier associé.
     /// @param duration La durée du film.
@@ -89,10 +92,10 @@ public:
     movie_ptr create_movie(std::string name, std::string pathname, uint32_t duration, uint32_t *chapters, uint32_t chaptersLength);
 
     /// @brief Crée un groupe gérer par le manager.
+    /// @throw `NameAlreadyTaken` Si le nom est déjà pris.
     /// @param name Le nom du groupe.
     /// @return Un pointeur partagé vers le groupe.
     group_ptr create_group(std::string name);
-
 
     /// @brief Affiche les informations d'un média.
     /// @param name Le nom du média.
@@ -139,6 +142,7 @@ public:
     manager_error save(std::string filename) const;
 
     /// @brief Charge les médias et les groupes depuis un fichier.
+    /// @throw `SerdeError` Si une erreur survient lors de la lecture du fichier.
     /// @param filename Le nom du fichier.
     /// @return `manager_error::UNABLE_TO_OPEN_FILE` si le fichier ne peut pas être ouvert, `manager_error::NONE` sinon.
     manager_error load(std::string filename);

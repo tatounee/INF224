@@ -102,19 +102,56 @@ std::string Movie::getSymbole() const
 
 void Movie::deserialize(serde_data_t serde_data, symboles_map symboles)
 {
-    auto it = serde_data.data.begin();
-    this->setName(*it++);
-    this->setPathname(*it++);
-    this->setDuration(std::stoi(*it++));
-    this->chaptersLength = std::stoi(*it++);
+    if (serde_data.class_name != "Movie")
+        throw WrongClass("Movie", serde_data.class_name);
 
-    this->chapters = new uint32_t[this->chaptersLength];
-    std::string chapters = *it++;
-    std::stringstream ss(chapters);
-    for (size_t i = 0; i < this->chaptersLength; i++)
+    if (serde_data.data.size() != 5)
+        throw NotEnoughData("Movie", 5, serde_data.data.size());
+
+    auto it = serde_data.data.begin();
+    
+    std::string name = *it;
+    std::string pathname = *++it;
+    uint32_t duration, chaptersLength;
+
+    try
+    {
+        duration = std::stoi(*++it);
+    }
+    catch (const std::exception &e)
+    {
+        throw CanNotInterpretData("Movie", "uint32_t", *it);
+    }
+
+    try
+    {
+        chaptersLength = std::stoi(*++it);
+    }
+    catch (const std::exception &e)
+    {
+        throw CanNotInterpretData("Movie", "uint32_t", *it);
+    }
+
+    uint32_t *chapters = new uint32_t[chaptersLength];
+
+    std::stringstream ss(*++it);
+    for (size_t i = 0; i < chaptersLength; i++)
     {
         std::string chapter;
         std::getline(ss, chapter, ' ');
-        this->chapters[i] = std::stoi(chapter);
+
+        try
+        {
+            chapters[i] = std::stoi(chapter);
+        }
+        catch (const std::exception &e)
+        {
+            throw CanNotInterpretData("Movie", "uint32_t", chapter);
+        }
     }
+
+    this->setName(name);
+    this->setPathname(pathname);
+    this->setDuration(duration);
+    this->setChapters(chapters, chaptersLength);
 }
