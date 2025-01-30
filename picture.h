@@ -76,23 +76,20 @@ public:
         system(cmd.data());
     }
 
-    std::string serialize(symboles_list &symboles) const override
+    void serialize(symboles_map &symboles) const override
     {
-        if (symboles.end() != std::find(symboles.begin(), symboles.end(), this->getSymbole()))
-            return std::string();
+        if (symboles.end() != symboles.find(this->getSymbole()))
+            return;
 
-        symboles.push_back(this->getSymbole());
+        serde_data_t data;
 
-        std::stringstream ss;
+        data.class_name = "Picture";
+        data.data.push_back(this->getName());
+        data.data.push_back(this->getPathname());
+        data.data.push_back(std::to_string(this->width));
+        data.data.push_back(std::to_string(this->height));
 
-        ss << ":" << this->getSymbole() << std::endl;
-        ss << "-Picture" << std::endl;
-        ss << "-" << this->getName() << std::endl;
-        ss << "-" << this->getPathname() << std::endl;
-        ss << "-" << this->width << std::endl;
-        ss << "-" << this->height << std::endl;
-
-        return ss.str();
+        symboles[this->getSymbole()] = data;
     };
 
     std::string getSymbole() const override
@@ -103,9 +100,9 @@ public:
         return std::string("picture_") + name;
     }
 
-    void deserialize(std::list<std::string> data, symbole_map symboles) override
+    void deserialize(serde_data_t serde_data, symboles_map symboles) override
     {
-        auto it = data.begin();
+        auto it = serde_data.data.begin();
         this->setName(*it++);
         this->setPathname(*it++);
         this->setWidth(std::stoi(*it++));

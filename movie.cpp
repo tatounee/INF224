@@ -67,45 +67,42 @@ void Movie::display(std::ostream &sout) const
     sout << "]" << std::endl;
 };
 
-std::string Movie::serialize(symboles_list &symboles) const
+void Movie::serialize(symboles_map &symboles) const
 {
-    if (symboles.end() != std::find(symboles.begin(), symboles.end(), this->getSymbole()))
-        return std::string();
+    if (symboles.end() != symboles.find(this->getSymbole()))
+        return;
 
-    symboles.push_back(this->getSymbole());
+    serde_data_t data;
+
+    data.class_name = "Movie";
+    data.data.push_back(this->getName());
+    data.data.push_back(this->getPathname());
+    data.data.push_back(std::to_string(this->getDuration()));
+    data.data.push_back(std::to_string(this->chaptersLength));
 
     std::stringstream ss;
-
-    ss << ":" << this->getSymbole() << std::endl;
-    ss << "-Movie" << std::endl;
-    ss << "-" << this->getName() << std::endl;
-    ss << "-" << this->getPathname() << std::endl;
-    ss << "-" << this->getDuration() << std::endl;
-    ss << "-" << this->chaptersLength << std::endl;
-
-    ss << "-";
     for (size_t i = 0; i < this->chaptersLength; i++)
     {
         if (i != 0)
             ss << ' ';
         ss << this->chapters[i];
     }
-    ss << std::endl;
+    data.data.push_back(ss.str());
 
-    return ss.str();
+    symboles[this->getSymbole()] = data;
 }
 
 std::string Movie::getSymbole() const
 {
     auto name = this->getName();
     std::replace(name.begin(), name.end(), ' ', '_');
-    
+
     return std::string("movie_") + name;
 }
 
-void Movie::deserialize(std::list<std::string> data, symbole_map symboles)
+void Movie::deserialize(serde_data_t serde_data, symboles_map symboles)
 {
-    auto it = data.begin();
+    auto it = serde_data.data.begin();
     this->setName(*it++);
     this->setPathname(*it++);
     this->setDuration(std::stoi(*it++));

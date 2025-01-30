@@ -5,6 +5,8 @@
 
 #include "manager.h"
 #include "serde.h"
+#include "serializer.h"
+#include "deserializer.h"
 
 #define TMP_KEY std::string("tmp-195a12a9-a5ab-40c1-a382-332102174f91")
 
@@ -119,68 +121,45 @@ void Manager::play_media(std::string name) const
     media->second->play();
 }
 
-std::string Manager::serialize(symboles_list &symboles) const
+void Manager::serialize(symboles_map &symboles) const
 {
-    if (symboles.end() != std::find(symboles.begin(), symboles.end(), MANAGER_SYMB))
-        return std::string();
-    symboles.push_back(MANAGER_SYMB);
+    if (symboles.end() != symboles.find(MANAGER_SYMB))
+        return;
 
-    std::stringstream ss;
-    std::stringstream group_media_ss;
+    serde_data_t data;
 
-    ss << ":" << MANAGER_SYMB << std::endl;
-    ss << "-Manager" << std::endl;
-    ss << "-";
+    data.class_name = "Manager";
 
     int i = 0;
+    std::stringstream groups_ss;
     for (auto &group : this->groups)
     {
         if (i++ > 0)
-            ss << ' ';
-        ss << group.second->getSymbole();
+            groups_ss << ' ';
+        groups_ss << group.second->getSymbole();
 
-        group_media_ss << group.second->serialize(symboles);
+        group.second->serialize(symboles);
     }
-
-    ss << std::endl;
-    ss << "-";
+    data.data.push_back(groups_ss.str());
 
     i = 0;
+    std::stringstream media_ss;
     for (auto &media : this->medias)
     {
         if (i++ > 0)
-            ss << ' ';
-        ss << media.second->getSymbole();
+            media_ss << ' ';
+        media_ss << media.second->getSymbole();
 
-        group_media_ss << media.second->serialize(symboles);
+        media.second->serialize(symboles);
     }
+    data.data.push_back(media_ss.str());
 
-    ss << std::endl;
-
-    ss << group_media_ss.str();
-
-    return ss.str();
+    symboles[MANAGER_SYMB] = data;
 }
 
-void Manager::save(std::string filename) const
+void Manager::deserialize(serde_data_t serde_data, symboles_map symboles)
 {
-    std::ofstream file(filename);
-
-    if (!file.is_open())
-    {
-        std::cerr << "Could not open file \"" << filename << "\"." << std::endl;
-        return;
-    }
-
-    symboles_list symboles;
-    file << this->serialize(symboles);
-
-    file.close();
-}
-
-void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
-{
-    auto it = data.begin();
+    auto it = serde_data.data.begin();
     std::string group_list = *it++;
     std::string media_list = *it++;
 
@@ -208,12 +187,12 @@ void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
             else if (symbole_data.class_name == "Movie")
                 media = this->create_movie(TMP_KEY, {}, {}, {}, {});
 
-            (*media).deserialize(symbole_data.data, symboles);
+            (*media).deserialize(symbole_data, symboles);
             this->medias.erase(TMP_KEY);
             this->medias[media->getName()] = media;
 
             // symboles[name].initialized_ptr = (void *)&media;
-            symbole_data.initialized_ptr = (void*)(&this->medias[media->getName()]);
+            symbole_data.initialized_ptr = (void *)(&this->medias[media->getName()]);
             symboles[name] = symbole_data;
         }
 
@@ -235,7 +214,7 @@ void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
         else
         {
             group_ptr group = this->create_group(name);
-            (*group).deserialize(symbole_data.data, symboles);
+            (*group).deserialize(symbole_data, symboles);
             this->groups.erase(name);
             this->groups[group->getName()] = group;
 
@@ -245,6 +224,24 @@ void Manager::deserialize(std::list<std::string> data, symbole_map symboles)
         name.clear();
         std::getline(groups_ss, name, ' ');
     }
+}
+
+void Manager::save(std::string filename) const
+{
+    std::ofstream file(filename);
+
+    if (!file.is_open())
+    {
+        std::cerr << "Could not open file \"" << filename << "\"." << std::endl;
+        return;
+    }
+
+    symboles_map symboles;
+    this->serialize(symboles);
+
+    serializer(file, symboles);
+
+    file.close();
 }
 
 void Manager::load(const std::string filename)
@@ -257,9 +254,11 @@ void Manager::load(const std::string filename)
         return;
     }
 
-    symbole_map symboles = parse_symboles(file);
+    symboles_map symboles;
+    deserializer(file, symboles);
     // print_symboles_map(symboles);
-    this->deserialize(symboles[MANAGER_SYMB].data, symboles);
+
+    this->deserialize(symboles[MANAGER_SYMB], symboles);
 
     file.close();
 }

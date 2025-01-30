@@ -22,7 +22,7 @@ private:
 protected:
     /// @brief Constructeur par défaut.
     Video() {};
-    
+
     /// @brief Constructeur avec paramètres.
     /// @param name Le nom de la vidéo.
     /// @param pathname Le chemin du fichier associé.
@@ -66,22 +66,19 @@ public:
         system(cmd.data());
     }
 
-    std::string serialize(symboles_list &symboles) const override
+    void serialize(symboles_map &symboles) const override
     {
-        if (symboles.end() != std::find(symboles.begin(), symboles.end(), this->getSymbole()))
-            return std::string();
+        if (symboles.end() != symboles.find(this->getSymbole()))
+            return;
 
-        symboles.push_back(this->getSymbole());
+        serde_data_t data;
 
-        std::stringstream ss;
+        data.class_name = "Video";
+        data.data.push_back(this->getName());
+        data.data.push_back(this->getPathname());
+        data.data.push_back(std::to_string(this->duration));
 
-        ss << ":" << this->getSymbole() << std::endl;
-        ss << "-Video" << std::endl;
-        ss << "-" << this->getName() << std::endl;
-        ss << "-" << this->getPathname() << std::endl;
-        ss << "-" << this->duration << std::endl;
-
-        return ss.str();
+        symboles[this->getSymbole()] = data;
     };
 
     std::string getSymbole() const override
@@ -92,9 +89,9 @@ public:
         return std::string("video_") + name;
     };
 
-    void deserialize(std::list<std::string> data, symbole_map symboles) override
+    void deserialize(serde_data_t serde_data, symboles_map symboles) override
     {
-        auto it = data.begin();
+        auto it = serde_data.data.begin();
         this->setName(*it++);
         this->setPathname(*it++);
         this->setDuration(std::stoi(*it++));

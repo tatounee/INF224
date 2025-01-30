@@ -1,5 +1,8 @@
 .vscode/
 
+doxyfile
+docs/
+
 *.o
 
 main

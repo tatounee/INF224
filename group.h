@@ -58,34 +58,29 @@ public:
         sout << "]" << std::endl;
     };
 
-    std::string serialize(symboles_list &symboles) const override
+    void serialize(symboles_map &symboles) const override
     {
-        if (symboles.end() != std::find(symboles.begin(), symboles.end(), this->getSymbole()))
-            return std::string();
-        symboles.push_back(this->getSymbole());
+        if (symboles.end() != symboles.find(this->getSymbole()))
+            return;
 
-        std::stringstream ss;
-        std::stringstream media_ss;
+        serde_data_t data;
 
-        ss << ":" << this->getSymbole() << std::endl;
-        ss << "-Group" << std::endl;
-        ss << "-" << this->getName() << std::endl;
-        ss << "-";
+        data.class_name = "Group";
+        data.data.push_back(this->getName());
 
         int i = 0;
+        std::stringstream ss;
         for (auto &media : *this)
         {
             if (i++ > 0)
                 ss << " ";
             ss << media->getSymbole();
 
-            media_ss << media->serialize(symboles);
+            media->serialize(symboles);
         }
+        data.data.push_back(ss.str());
 
-        ss << std::endl;
-        ss << media_ss.str();
-
-        return ss.str();
+        symboles[this->getSymbole()] = data;
     };
 
     std::string getSymbole() const override
@@ -96,9 +91,9 @@ public:
         return std::string("group_") + name;
     };
 
-    void deserialize(std::list<std::string> data, symbole_map symboles) override
+    void deserialize(serde_data_t serde_data, symboles_map symboles) override
     {
-        auto it = data.begin();
+        auto it = serde_data.data.begin();
         auto nnn = *it++;
         this->setName(nnn);
 

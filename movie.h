@@ -69,11 +69,11 @@ public:
     /// @brief Affiche les informations du film.
     void display(std::ostream &sout) const;
 
-    std::string serialize(symboles_list &symboles) const override;
+    void serialize(symboles_map &symboles) const override;
 
     std::string getSymbole() const override;
 
-    void deserialize(std::list<std::string> data, symbole_map symboles) override;
+    void deserialize(serde_data_t serde_data, symboles_map symboles) override;
 };
 
 #endif

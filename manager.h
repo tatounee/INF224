@@ -92,9 +92,9 @@ public:
     /// @param name Le nom du média.
     void play_media(std::string name) const;
 
-    std::string serialize(symboles_list &symboles) const override;
+    void serialize(symboles_map &symboles) const override;
     std::string getSymbole() const override { return MANAGER_SYMB; };
-    void deserialize(std::list<std::string> data, symbole_map symboles) override;
+    void deserialize(serde_data_t serde_data, symboles_map symboles) override;
 
     /// @brief Sauvegarde les médias et les groupes dans un fichier.
     /// @param filename Le nom du fichier.
