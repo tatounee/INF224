@@ -11,7 +11,7 @@
 #include "video.h"
 #include "movie.h"
 #include "group.h"
-#include "serde.h"
+#include "../serde/serde.h"
 
 #define MANAGER_SYMB ("manager")
 

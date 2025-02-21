@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include "ccsocket.h"
+#include "network/ccsocket.h"
 
 static const std::string HOST = "127.0.0.1";
 static const int PORT = 3331;

@@ -15,8 +15,8 @@ SERVER = server
 #
 # Fichiers sources (NE PAS METTRE les .h ni les .o seulement les .cpp)
 #
-CLIENT_SOURCES = client.cpp ccsocket.cpp
-SERVER_SOURCES = server.cpp movie.cpp manager.cpp tcpserver.cpp ccsocket.cpp commands.cpp serde.cpp serializer.cpp deserializer.cpp
+CLIENT_SOURCES = client.cpp network/ccsocket.cpp
+SERVER_SOURCES = server.cpp commands.cpp media/movie.cpp media/manager.cpp network/tcpserver.cpp network/ccsocket.cpp serde/serde.cpp serde/serializer.cpp serde/deserializer.cpp
 
 
 #
@@ -71,7 +71,7 @@ ${SERVER}: depend-${SERVER} ${SERVER_OBJETS}
 	${CXX} -o $@ ${CXXFLAGS} ${LDFLAGS} ${SERVER_OBJETS} ${LDLIBS}
 
 clean:
-	-@$(RM) *.o depend-${CLIENT} depend-${SERVER} core 1>/dev/null 2>&1
+	-@$(RM) *.o **/*.o depend-${CLIENT} depend-${SERVER} core 1>/dev/null 2>&1
 
 clean-all: clean
 	-@$(RM) ${CLIENT} ${SERVER} 1>/dev/null 2>&1

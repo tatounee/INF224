@@ -1,9 +1,9 @@
 
 #include <algorithm>
 
-#include "tcpserver.h"
+#include "network/tcpserver.h"
+#include "media/manager.h"
 #include "commands.h"
-#include "manager.h"
 
 const int PORT = 3331;
 

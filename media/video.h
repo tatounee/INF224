@@ -34,6 +34,8 @@ protected:
 
     static std::shared_ptr<Video> new_shared(std::string name, std::string pathname, uint32_t duration)
     {
+        // Astuce pour permettre la création de shared_ptr<Video> malgré que tous ses constructeurs soient protected.
+        // See : https://stackoverflow.com/questions/8147027/how-do-i-call-stdmake-shared-on-a-class-with-only-protected-or-private-const/#answer-25069711
         struct NonProtectedVideo : public Video
         {
         public:

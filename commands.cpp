@@ -2,7 +2,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include "manager.h"
+#include "media/manager.h"
 #include "commands.h"
 
 /// @brief Recherche un média et l'affiche dans `response`.

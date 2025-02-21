@@ -7,7 +7,7 @@
 #include <memory>
 #include <algorithm>
 
-#include "serde.h"
+#include "../serde/serde.h"
 #include "media.h"
 
 class Manager;
@@ -30,6 +30,8 @@ protected:
 
     static std::shared_ptr<Group> new_shared(std::string name)
     {
+        // Astuce pour permettre la création de shared_ptr<Group> malgré que tous ses constructeurs soient protected.
+        // See : https://stackoverflow.com/questions/8147027/how-do-i-call-stdmake-shared-on-a-class-with-only-protected-or-private-const/#answer-25069711
         struct NonProtectedGroup : public Group
         {
         public:

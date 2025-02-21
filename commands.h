@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-#include "manager.h"
+#include "media/manager.h"
 
 typedef std::map<std::string, void (*)(std::string &response, std::string &data, Manager &manager)> commands_t;
 

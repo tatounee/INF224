@@ -39,6 +39,8 @@ protected:
 
     static std::shared_ptr<Picture> new_shared(std::string name, std::string pathname, uint32_t width, uint32_t height)
     {
+        // Astuce pour permettre la création de shared_ptr<Picture> malgré que tous ses constructeurs soient protected.
+        // See : https://stackoverflow.com/questions/8147027/how-do-i-call-stdmake-shared-on-a-class-with-only-protected-or-private-const/#answer-25069711
         struct NonProtectedPicture : public Picture
         {
         public:
