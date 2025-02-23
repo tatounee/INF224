@@ -1,15 +1,1 @@
 .vscode/
-
-doxyfile
-docs/
-
-*.o
-
-main
-depend-main
-
-server
-depend-server
-
-client
-depend-client
