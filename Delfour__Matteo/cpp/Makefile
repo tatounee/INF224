@@ -58,10 +58,9 @@ LDLIBS = -lpthread
  
 all: ${CLIENT} ${SERVER}
 
-run: ${CLIENT} ${SERVER}
+run: ${SERVER}
 	@clear
 	@./${SERVER}
-	@./${CLIENT}
 
 
 ${CLIENT}: depend-${CLIENT} ${CLIENT_OBJETS}
