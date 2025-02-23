@@ -1,11 +1,19 @@
 
-all: swing/Main.class
+main = Main
+pkg = swing
 
-run: swing/Main.class
-	java swing/Main
+SOURCES = Main.java Client.java
 
-swing/Main.class: Main.java
-	javac -d . Main.java
+comiled_main = ${pkg}/${main}.class
+
+
+all: ${comiled_main}
+
+run: ${comiled_main}
+	java ${pkg}/${main}
+
+swing/Main.class: ${SOURCES}
+	javac -d . ${SOURCES}
 
 clean:
-	@rm -r swing
+	@rm -r ${pkg}

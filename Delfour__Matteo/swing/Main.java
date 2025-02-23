@@ -1,43 +1,65 @@
 package swing;
 
 import javax.swing.*;
+
 import java.awt.event.*;
 
+/// @brief Classe principale de l'application.
 public class Main extends JFrame {
-    // JScrollPane scrollPane;
-    // JTextArea text;
+    private static final long serialVersionUID = 1L;
 
-    // JMenuBar menuBar;
-    // JToolBar toolBar;
-    // Button button0;
-    // Button button1;
-    // Button button2;
+    static Client client;
+
+    static int WIDTH = 40;
+    static int HEIGHT = 15;
+    static JTextArea text = new JTextArea(HEIGHT, WIDTH);
+    static JTextField input = new JTextField(WIDTH);
 
     public Main() {
-        JTextArea text = new JTextArea(10, 30);
+        JScrollPane scrollPane = new JScrollPane(text);
         text.setLineWrap(true);
         text.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(text);
 
-        Button button0 = new Button("Click 0", (event) -> text.append("Button 0 clicked\n"));
-        Button button1 = new Button("Click 1", (event) -> text.append("Button 1 clicked\n"));
-        Button button2 = new Button("Quit", (event) -> System.exit(0));
+        // Ensemble des boutons de la barre d'outils et du menu.
+        Object[] buttons = new Object[] {
+                new Button("Jouer", (event) -> send("play", input.getText())),
+                new JSeparator(),
+                new Button("Lister les media", (event) -> send("listmedia")),
+                new Button("Chercher un media", (event) -> send("findmedia", input.getText())),
+                new Button("Supprimer un media", (event) -> send("deletemedia", input.getText())),
+                new JSeparator(),
+                new Button("Lister les groupes", (event) -> send("listgroup")),
+                new Button("Chercher un groupe", (event) -> send("findgroup", input.getText())),
+                new Button("Supprimer un group", (event) -> send("deletegroup", input.getText())),
+                new JSeparator(),
+                new Button("Sauvegarder", (event) -> send("save", input.getText())),
+                new Button("Charger", (event) -> send("load", input.getText())),
+                new JSeparator(),
+                new Button("Quitter", (event) -> System.exit(0))
+        };
 
         JToolBar toolBar = new JToolBar();
-        toolBar.add(button0);
-        toolBar.add(button1);
-        toolBar.add(button2);
 
-        JMenu menu = new JMenu("Action");
-        menu.add(new JMenuItem(button0));
-        menu.add(new JMenuItem(button1));
-        menu.add(new JMenuItem(button2));
         JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Action");
         menuBar.add(menu);
+
+        // Ajout des boutons à la barre d'outils et au menu.
+        for (Object button : buttons) {
+            if (button instanceof JSeparator) {
+                toolBar.addSeparator();
+                menu.addSeparator();
+                continue;
+            }
+
+            toolBar.add((Button) button);
+            menu.add(new JMenuItem((Button) button));
+        }
 
         setJMenuBar(menuBar);
         getContentPane().add(scrollPane, "Center");
-        getContentPane().add(toolBar, "South");
+        getContentPane().add(toolBar, "North");
+        getContentPane().add(input, "South");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -46,12 +68,36 @@ public class Main extends JFrame {
         setVisible(true);
     }
 
+    /// @brief Envoie une requête au serveur et affiche la réponse.
+    private void send(String request, String... args) {
+        for (String arg : args) {
+            request += " " + arg;
+        }
+        String response = client.send(request);
+        response = response.replace(";", "\n");
+
+        String separtor = String.format("\n--- %s ---\n", request);
+        text.append(separtor);
+
+        text.append(response);
+    }
+
+    /// @brief Point d'entrée du programme.
     public static void main(String argv[]) {
-        Main toplevel = new Main();
+        try {
+            client = new Client("localhost", 3331);
+        } catch (Exception e) {
+            System.err.println("Client: Couldn't connect to localhost:3331");
+            System.exit(1);
+        }
+
+        new Main();
     }
 
 }
 
+/// @brief Class pour un Button. Peut être utilisé pour les boutons de la barre
+/// d'outils et du menu.
 class Button extends AbstractAction {
     ActionListener action;
 
